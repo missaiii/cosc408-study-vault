@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Queue & Chill — Queuing Theory Mastery</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --red:#E50914;
+  --red2:#B20710;
+  --dark:#141414;
+  --dark2:#1a1a1a;
+  --dark3:#242424;
+  --card:#1f1f1f;
+  --border:#333;
+  --text:#e5e5e5;
+  --muted:#a3a3a3;
+  --gold:#F5A623;
+  --teal:#17c3b2;
+  --blue:#3b82f6;
+  --green:#22c55e;
+}
+html{scroll-behavior:smooth}
+body{background:var(--dark);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;line-height:1.6;overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:linear-gradient(180deg,rgba(0,0,0,.9) 0%,transparent 100%);padding:1rem 3rem;display:flex;align-items:center;gap:2rem}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:var(--red);letter-spacing:2px;text-shadow:0 0 30px rgba(229,9,20,.4)}
+.nav-links{display:flex;gap:1.5rem}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:.85rem;font-weight:500;transition:color .2s;cursor:pointer}
+.nav-links a:hover{color:var(--text)}
+
+/* HERO */
+.hero{position:relative;min-height:100vh;display:flex;align-items:center;padding:0 3rem;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 70% 50%,rgba(229,9,20,.15) 0%,transparent 70%),linear-gradient(180deg,rgba(0,0,0,.3) 0%,var(--dark) 100%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(229,9,20,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(229,9,20,.05) 1px,transparent 1px);background-size:60px 60px;opacity:.5}
+.hero-content{position:relative;max-width:650px}
+.hero-eyebrow{font-size:.75rem;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:1rem}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(3.5rem,8vw,7rem);line-height:.95;color:#fff;margin-bottom:1.5rem}
+.hero-title span{color:var(--red)}
+.hero-sub{font-size:1.1rem;color:var(--muted);font-weight:300;margin-bottom:2.5rem;max-width:500px;line-height:1.8}
+.hero-tags{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:2.5rem}
+.tag{background:rgba(229,9,20,.15);border:1px solid rgba(229,9,20,.3);color:var(--red);font-size:.75rem;font-weight:600;letter-spacing:1px;padding:.35rem .8rem;border-radius:4px}
+.btn-primary{display:inline-flex;align-items:center;gap:.5rem;background:var(--red);color:#fff;font-weight:600;font-size:.95rem;padding:.9rem 2rem;border:none;border-radius:4px;cursor:pointer;text-decoration:none;transition:background .2s,transform .1s}
+.btn-primary:hover{background:var(--red2);transform:scale(1.02)}
+.btn-outline{display:inline-flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.15);color:#fff;font-weight:600;font-size:.95rem;padding:.9rem 2rem;border:none;border-radius:4px;cursor:pointer;margin-left:.75rem;backdrop-filter:blur(4px);transition:background .2s}
+.btn-outline:hover{background:rgba(255,255,255,.25)}
+.hero-stats{position:absolute;bottom:3rem;left:3rem;right:3rem;display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.stat-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:1.25rem;backdrop-filter:blur(8px)}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:var(--red)}
+.stat-label{font-size:.8rem;color:var(--muted);font-weight:300;margin-top:.15rem}
+
+/* SECTION */
+.section{padding:5rem 3rem}
+.section-eyebrow{font-size:.75rem;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:.75rem}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,5vw,3.5rem);color:#fff;margin-bottom:1rem}
+.section-sub{color:var(--muted);font-size:1rem;font-weight:300;max-width:600px;margin-bottom:3rem;line-height:1.8}
+.divider{width:60px;height:3px;background:var(--red);border-radius:2px;margin-bottom:1.5rem}
+
+/* CONTENT CARDS GRID */
+.content-row{display:grid;gap:1rem}
+.content-row-4{grid-template-columns:repeat(4,1fr)}
+.content-row-3{grid-template-columns:repeat(3,1fr)}
+.content-row-2{grid-template-columns:repeat(2,1fr)}
+.content-card{background:var(--card);border:1px solid var(--border);border-radius:8px;overflow:hidden;transition:transform .2s,border-color .2s;cursor:pointer}
+.content-card:hover{transform:scale(1.03);border-color:rgba(229,9,20,.4)}
+.card-thumb{height:160px;display:flex;align-items:center;justify-content:center;font-size:2.5rem;position:relative;overflow:hidden}
+.card-thumb.red{background:linear-gradient(135deg,#2d0a0a,#5a1010)}
+.card-thumb.blue{background:linear-gradient(135deg,#0a1a2d,#103058)}
+.card-thumb.teal{background:linear-gradient(135deg,#0a2d2a,#105a4a)}
+.card-thumb.gold{background:linear-gradient(135deg,#2d1f0a,#5a3e10)}
+.card-thumb.purple{background:linear-gradient(135deg,#1a0a2d,#3a1060)}
+.card-body{padding:1rem}
+.card-title{font-weight:600;font-size:.95rem;margin-bottom:.35rem;color:#fff}
+.card-desc{font-size:.8rem;color:var(--muted);line-height:1.5}
+.card-badge{position:absolute;top:.5rem;right:.5rem;background:var(--red);color:#fff;font-size:.65rem;font-weight:700;letter-spacing:1px;padding:.2rem .5rem;border-radius:3px}
+
+/* THEORY PANELS */
+.theory-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:3rem}
+.theory-panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2rem}
+.theory-panel h3{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:#fff;margin-bottom:1rem}
+.theory-panel .icon{font-size:2rem;margin-bottom:1rem;display:block}
+
+/* FORMULA BOX */
+.formula{background:rgba(229,9,20,.08);border:1px solid rgba(229,9,20,.25);border-radius:8px;padding:1.25rem;font-family:monospace;font-size:1rem;color:var(--text);margin:1rem 0;line-height:2}
+.formula .var{color:var(--gold)}
+.formula .eq{color:var(--muted)}
+
+/* NOTATION TABLE */
+.notation-table{width:100%;border-collapse:collapse;margin:1.5rem 0}
+.notation-table th{background:rgba(229,9,20,.15);color:var(--red);font-size:.8rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:.75rem 1rem;text-align:left;border-bottom:1px solid rgba(229,9,20,.2)}
+.notation-table td{padding:.75rem 1rem;border-bottom:1px solid var(--border);font-size:.9rem;vertical-align:top}
+.notation-table td:first-child{font-family:monospace;color:var(--gold);font-size:1rem;font-weight:600;white-space:nowrap}
+.notation-table tr:last-child td{border-bottom:none}
+
+/* SIMULATOR */
+.sim-container{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2.5rem;margin-top:2rem}
+.sim-controls{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:2rem}
+.sim-control label{display:block;font-size:.8rem;font-weight:600;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:.5rem}
+.sim-control input[type=range]{width:100%;accent-color:var(--red);cursor:pointer}
+.sim-control .val{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--red)}
+.sim-output{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;margin-top:1.5rem}
+.sim-metric{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:1rem;text-align:center}
+.sim-metric .sm-num{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:#fff}
+.sim-metric .sm-label{font-size:.75rem;color:var(--muted);margin-top:.25rem}
+.sim-status{display:inline-flex;align-items:center;gap:.5rem;padding:.4rem 1rem;border-radius:99px;font-size:.8rem;font-weight:600;margin-top:1rem}
+.status-stable{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:var(--green)}
+.status-unstable{background:rgba(229,9,20,.15);border:1px solid rgba(229,9,20,.3);color:var(--red)}
+
+/* STOCHASTIC */
+.stoch-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem}
+.stoch-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.75rem}
+.stoch-card h4{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:#fff;margin-bottom:.75rem}
+.stoch-card p{font-size:.9rem;color:var(--muted);line-height:1.7;margin-bottom:.75rem}
+.highlight-box{background:rgba(245,166,35,.08);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:.75rem 1rem;font-size:.9rem;color:var(--text);margin:.75rem 0}
+
+/* MONTE CARLO */
+.mc-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start}
+.decision-tree{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2rem}
+
+/* ACCORDION */
+.accordion{margin-top:2rem}
+.acc-item{background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:.75rem;overflow:hidden}
+.acc-header{width:100%;background:none;border:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:500;padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:background .2s}
+.acc-header:hover{background:rgba(255,255,255,.04)}
+.acc-header .chevron{color:var(--red);font-size:1.2rem;transition:transform .2s}
+.acc-item.open .chevron{transform:rotate(180deg)}
+.acc-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.acc-body-inner{padding:0 1.5rem 1.5rem;font-size:.9rem;color:var(--muted);line-height:1.8}
+
+/* PROCESS VIZ */
+.process-flow{display:flex;align-items:center;gap:0;margin:2rem 0;overflow-x:auto;padding:.5rem 0}
+.pf-stage{flex-shrink:0;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1.25rem 1.5rem;text-align:center;min-width:140px}
+.pf-stage .pf-icon{font-size:1.5rem;margin-bottom:.5rem}
+.pf-stage .pf-label{font-size:.8rem;font-weight:600;color:#fff;margin-bottom:.25rem}
+.pf-stage .pf-sub{font-size:.7rem;color:var(--muted)}
+.pf-arrow{color:var(--red);font-size:1.5rem;padding:0 .5rem;flex-shrink:0}
+.pf-stage.active{border-color:rgba(229,9,20,.5);background:rgba(229,9,20,.08)}
+
+/* SYSTEM TYPES */
+.system-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2rem}
+.sys-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;transition:border-color .2s}
+.sys-card:hover{border-color:rgba(229,9,20,.4)}
+.sys-card h4{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:#fff;margin-bottom:.5rem}
+.sys-card p{font-size:.85rem;color:var(--muted);line-height:1.6}
+.sys-badge{display:inline-block;background:rgba(23,195,178,.15);border:1px solid rgba(23,195,178,.3);color:var(--teal);font-size:.7rem;font-weight:700;letter-spacing:1px;padding:.2rem .6rem;border-radius:3px;margin-bottom:.75rem}
+
+/* CHANNEL DIAGRAM */
+.channel-viz{display:flex;gap:2rem;margin:1.5rem 0}
+.channel{display:flex;flex-direction:column;align-items:center;gap:.5rem;flex:1}
+.channel-title{font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+.channel-queue{display:flex;gap:3px;margin-bottom:.25rem}
+.person{width:18px;height:30px;background:var(--blue);border-radius:3px 3px 0 0}
+.server-box{background:rgba(229,9,20,.2);border:2px solid var(--red);border-radius:6px;padding:.5rem 1rem;font-size:.75rem;font-weight:600;color:var(--red);text-align:center}
+
+/* POISSON VIZ */
+.poisson-bars{display:flex;align-items:flex-end;gap:4px;height:120px;margin:1rem 0}
+.pb{background:var(--red);border-radius:3px 3px 0 0;flex:1;opacity:.8;transition:height .3s}
+.pb-labels{display:flex;gap:4px}
+.pb-l{flex:1;text-align:center;font-size:.65rem;color:var(--muted)}
+
+/* MARKOV */
+.markov-states{display:flex;gap:1rem;align-items:center;justify-content:center;flex-wrap:wrap;margin:1.5rem 0}
+.m-state{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.3rem;border:2px solid;position:relative;cursor:pointer;transition:transform .2s}
+.m-state:hover{transform:scale(1.1)}
+.m-state.s0{background:rgba(59,130,246,.15);border-color:var(--blue);color:var(--blue)}
+.m-state.s1{background:rgba(34,197,94,.15);border-color:var(--green);color:var(--green)}
+.m-state.s2{background:rgba(245,166,35,.15);border-color:var(--gold);color:var(--gold)}
+.m-state.s3{background:rgba(229,9,20,.15);border-color:var(--red);color:var(--red)}
+.m-arrow{font-size:1.2rem;color:var(--muted)}
+
+/* DATA SECTION */
+.data-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2rem}
+.data-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.75rem}
+.data-card h4{font-size:1rem;font-weight:600;color:#fff;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
+.data-card p{font-size:.85rem;color:var(--muted);line-height:1.7}
+
+/* EXAM TIPS */
+.tips-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;margin-top:2rem}
+.tip-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1.5rem;display:flex;gap:1rem}
+.tip-num{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:rgba(229,9,20,.3);line-height:1;flex-shrink:0}
+.tip-content h4{font-size:.95rem;font-weight:600;color:#fff;margin-bottom:.35rem}
+.tip-content p{font-size:.85rem;color:var(--muted);line-height:1.6}
+
+/* TABLE */
+.real-table{width:100%;border-collapse:collapse}
+.real-table th{background:rgba(255,255,255,.05);color:var(--muted);font-size:.75rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:.75rem 1rem;text-align:left;border-bottom:1px solid var(--border)}
+.real-table td{padding:.75rem 1rem;border-bottom:1px solid rgba(255,255,255,.04);font-size:.9rem}
+.real-table tr:last-child td{border-bottom:none}
+.real-table tr:hover td{background:rgba(255,255,255,.02)}
+
+/* PROGRESS BAR */
+.progress-bar-wrap{background:rgba(255,255,255,.08);border-radius:99px;height:8px;overflow:hidden;margin:.5rem 0}
+.progress-bar{height:100%;border-radius:99px;background:var(--red);transition:width 1s ease}
+
+/* FOOTER */
+footer{background:var(--dark2);border-top:1px solid var(--border);padding:3rem;text-align:center}
+footer .logo-f{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--red);margin-bottom:.5rem}
+footer p{font-size:.85rem;color:var(--muted)}
+
+/* UTILS */
+.red{color:var(--red)}
+.gold{color:var(--gold)}
+.teal{color:var(--teal)}
+.green{color:var(--green)}
+.blue{color:var(--blue)}
+.mono{font-family:monospace}
+.bold{font-weight:600;color:#fff}
+ul.styled{list-style:none;margin:.75rem 0}
+ul.styled li{padding:.35rem 0;padding-left:1.25rem;position:relative;font-size:.9rem;color:var(--muted)}
+ul.styled li::before{content:"▶";position:absolute;left:0;color:var(--red);font-size:.55rem;top:.6rem}
+.section-alt{background:var(--dark2)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
+
+@media(max-width:900px){
+  nav{padding:1rem 1.5rem}
+  .section{padding:3rem 1.5rem}
+  .hero{padding:0 1.5rem}
+  .hero-stats{left:1.5rem;right:1.5rem;grid-template-columns:repeat(2,1fr)}
+  .content-row-4,.content-row-3,.theory-grid,.stoch-grid,.system-grid,.two-col,.data-grid,.tips-grid{grid-template-columns:1fr}
+  .mc-grid{grid-template-columns:1fr}
+  .sim-controls,.sim-output{grid-template-columns:1fr}
+  .channel-viz{flex-wrap:wrap}
+  .hero-title{font-size:3rem}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Q&amp;CHILL</div>
+  <div class="nav-links">
+    <a onclick="scrollTo('conceptual')">Conceptual</a>
+    <a onclick="scrollTo('specification')">Specification</a>
+    <a onclick="scrollTo('computational')">Computational</a>
+    <a onclick="scrollTo('stochastic')">Stochastic</a>
+    <a onclick="scrollTo('montecarlo')">Monte Carlo</a>
+    <a onclick="scrollTo('data')">Data</a>
+    <a onclick="scrollTo('exam')">Exam Tips</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">COSC 408 — Modelling Topic 6</div>
+    <h1 class="hero-title">QUEUE<br>&amp; <span>CHILL</span></h1>
+    <p class="hero-sub">Master the complete modelling pipeline — from conceptual system design to stochastic processes, Monte Carlo simulation, and data-driven forecasting. Everything you need, one stream.</p>
+    <div class="hero-tags">
+      <span class="tag">M/M/1</span>
+      <span class="tag">M/M/c</span>
+      <span class="tag">Poisson</span>
+      <span class="tag">Markov</span>
+      <span class="tag">Kendall-Lee</span>
+      <span class="tag">Monte Carlo</span>
+    </div>
+    <a class="btn-primary" onclick="scrollTo('conceptual')">▶ Start Watching</a>
+    <a class="btn-outline" onclick="scrollTo('exam')">ℹ More Info</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-card">
+      <div class="stat-num">5</div>
+      <div class="stat-label">Modelling Modules</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">6</div>
+      <div class="stat-label">Kendall-Lee Parameters</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">λ&lt;μ</div>
+      <div class="stat-label">Stability Condition</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">∞</div>
+      <div class="stat-label">Applications</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     A. CONCEPTUAL MODELLING
+════════════════════════════════════════════════════════════ -->
+<section class="section" id="conceptual">
+  <div class="section-eyebrow">Module A — Now Playing</div>
+  <h2 class="section-title">Conceptual Modelling</h2>
+  <div class="divider"></div>
+  <p class="section-sub">Identify system components, describe system flow, and understand multi-phase configurations and real-world constraints. This is where every model begins.</p>
+
+  <!-- Content Row -->
+  <div class="content-row content-row-4" style="margin-bottom:2rem">
+    <div class="content-card">
+      <div class="card-thumb red">🏪<div class="card-badge">CORE</div></div>
+      <div class="card-body">
+        <div class="card-title">System Components</div>
+        <div class="card-desc">Entities, queues, servers, and resources — the four building blocks of every queuing system.</div>
+      </div>
+    </div>
+    <div class="content-card">
+      <div class="card-thumb blue">🔄</div>
+      <div class="card-body">
+        <div class="card-title">System Flow</div>
+        <div class="card-desc">Arrival → Queue → Service stages → Exit. The universal pipeline structure.</div>
+      </div>
+    </div>
+    <div class="content-card">
+      <div class="card-thumb teal">⚙️</div>
+      <div class="card-body">
+        <div class="card-title">Multi-Phase Systems</div>
+        <div class="card-desc">Customers passing through multiple service points in series — like a car wash or hospital admission.</div>
+      </div>
+    </div>
+    <div class="content-card">
+      <div class="card-thumb gold">⚠️</div>
+      <div class="card-body">
+        <div class="card-title">Constraints</div>
+        <div class="card-desc">Balking, reneging, jockeying, finite capacity — real-world behaviours that complicate models.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Process Flow Visual -->
+  <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:#fff;margin-bottom:1.25rem">The Universal Queue Pipeline</h3>
+  <div class="process-flow">
+    <div class="pf-stage active">
+      <div class="pf-icon">👥</div>
+      <div class="pf-label">Calling Population</div>
+      <div class="pf-sub">Finite or Infinite</div>
+    </div>
+    <div class="pf-arrow">→</div>
+    <div class="pf-stage">
+      <div class="pf-icon">📥</div>
+      <div class="pf-label">Arrivals</div>
+      <div class="pf-sub">λ — arrival rate</div>
+    </div>
+    <div class="pf-arrow">→</div>
+    <div class="pf-stage">
+      <div class="pf-icon">🔢</div>
+      <div class="pf-label">Queue</div>
+      <div class="pf-sub">Capacity + Discipline</div>
+    </div>
+    <div class="pf-arrow">→</div>
+    <div class="pf-stage">
+      <div class="pf-icon">🔧</div>
+      <div class="pf-label">Service</div>
+      <div class="pf-sub">μ — service rate</div>
+    </div>
+    <div class="pf-arrow">→</div>
+    <div class="pf-stage">
+      <div class="pf-icon">✅</div>
+      <div class="pf-label">Exit</div>
+      <div class="pf-sub">Served customers</div>
+    </div>
+  </div>
+
+  <!-- System Examples Table -->
+  <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:#fff;margin:2rem 0 1rem">Real-World Systems</h3>
+  <table class="real-table">
+    <thead><tr><th>System</th><th>Customers (Entities)</th><th>Servers</th><th>Queue Type</th></tr></thead>
+    <tbody>
+      <tr><td>🏪 Grocery Store</td><td>Shoppers</td><td>Checkout Clerks</td><td>Multi-channel, single-phase</td></tr>
+      <tr><td>📞 Phone System</td><td>Phone Calls</td><td>Switching Equipment</td><td>Finite capacity, auto-route</td></tr>
+      <tr><td>🛣️ Toll Highway</td><td>Vehicles</td><td>Tollgate</td><td>Multi-channel, arrivals clustered</td></tr>
+      <tr><td>🍽️ Restaurant</td><td>Diners</td><td>Tables &amp; Waiters</td><td>Dual resource constraint</td></tr>
+      <tr><td>🏭 Factory</td><td>Products</td><td>Workers / Machines</td><td>Multi-phase series system</td></tr>
+      <tr><td>🏥 Hospital ER</td><td>Patients</td><td>Nurses, Doctors, Beds</td><td>Priority discipline, multi-phase</td></tr>
+    </tbody>
+  </table>
+
+  <!-- Queue Discipline -->
+  <div class="theory-grid" style="margin-top:3rem">
+    <div class="theory-panel">
+      <span class="icon">📋</span>
+      <h3>Queue Disciplines</h3>
+      <ul class="styled">
+        <li><span class="bold">FIFO / FCFS</span> — First Come, First Served. Most common. Customers served in order of arrival.</li>
+        <li><span class="bold">LIFO / LCFS</span> — Last Come, First Served. Most recent arrivals served first (e.g. stack-based processing).</li>
+        <li><span class="bold">SIRO</span> — Service In Random Order. Next customer chosen randomly from waiting pool.</li>
+        <li><span class="bold">Priority</span> — Each arrival classified into priority categories. Within each level, FCFS applies.</li>
+      </ul>
+      <div class="highlight-box">⚠️ <strong>Balking</strong> = customer arrives but refuses to join. <strong>Reneging</strong> = customer joins then leaves. <strong>Jockeying</strong> = switching between queues.</div>
+    </div>
+    <div class="theory-panel">
+      <span class="icon">🖥️</span>
+      <h3>Server Arrangements</h3>
+      <ul class="styled">
+        <li><span class="bold">Servers in Parallel</span> — All servers provide the same service type. Customer needs only ONE server to complete service. E.g. bank tellers, supermarket checkouts.</li>
+        <li><span class="bold">Servers in Series</span> — Customer must pass through MULTIPLE servers sequentially before service is complete. E.g. hospital admission → triage → doctor → pharmacy.</li>
+      </ul>
+      <div class="channel-viz">
+        <div class="channel">
+          <div class="channel-title">Parallel</div>
+          <div class="channel-queue"><div class="person"></div><div class="person"></div><div class="person"></div></div>
+          <div style="display:flex;gap:.5rem">
+            <div class="server-box">S1</div>
+            <div class="server-box">S2</div>
+          </div>
+        </div>
+        <div class="channel">
+          <div class="channel-title">Series</div>
+          <div class="channel-queue"><div class="person"></div></div>
+          <div style="display:flex;align-items:center;gap:.25rem">
+            <div class="server-box">A</div><span style="color:var(--red)">→</span>
+            <div class="server-box">B</div><span style="color:var(--red)">→</span>
+            <div class="server-box">C</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- System Type Cards -->
+  <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:#fff;margin-top:2rem">Channel / Phase Configurations</h3>
+  <div class="system-grid">
+    <div class="sys-card">
+      <div class="sys-badge">M=1, PHASE=1</div>
+      <h4>Single-Channel / Single-Phase</h4>
+      <p>One queue, one server. Simplest model. E.g. a single ATM machine. Described as M/M/1 in Kendall-Lee notation.</p>
+    </div>
+    <div class="sys-card">
+      <div class="sys-badge">M=2, PHASE=1</div>
+      <h4>Dual-Channel / Single-Phase</h4>
+      <p>Two parallel servers, each providing identical service. Customers join a single shared queue or separate queues. E.g. two checkout lanes.</p>
+    </div>
+    <div class="sys-card">
+      <div class="sys-badge">M=2, PHASE=3</div>
+      <h4>Dual-Channel / Triple-Phase</h4>
+      <p>Two identical service channels, each with 3 distinct service points (A→B→C). Jockeying may be permitted between lines.</p>
+    </div>
+    <div class="sys-card">
+      <div class="sys-badge">M=3, PHASE=2</div>
+      <h4>Triple-Channel / Dual-Phase</h4>
+      <p>Three identical service channels, each with 2 distinct service points (A→B). Used when there is high parallel demand and a two-step process.</p>
+    </div>
+    <div class="sys-card">
+      <div class="sys-badge">M=c, PHASE=k</div>
+      <h4>General Multi-Channel/Phase</h4>
+      <p>The general form with c parallel channels and k phases per channel. Most real hospital and manufacturing systems fall here.</p>
+    </div>
+    <div class="sys-card">
+      <div class="sys-badge">FINITE K</div>
+      <h4>Finite Capacity System</h4>
+      <p>Queue has a maximum size K. Customers arriving when the system is full are turned away (lost). Used for call centres, parking lots.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     B. SPECIFICATION MODELLING
+════════════════════════════════════════════════════════════ -->
+<section class="section section-alt" id="specification">
+  <div class="section-eyebrow">Module B — Specification Modelling</div>
+  <h2 class="section-title">Defining the System</h2>
+  <div class="divider"></div>
+  <p class="section-sub">Define arrival patterns, specify service-time distributions, state assumptions explicitly, and identify bottlenecks. A model is only as good as its specification.</p>
+
+  <div class="two-col">
+    <div>
+      <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:#fff;margin-bottom:1rem">Key Variables</h3>
+      <table class="notation-table">
+        <thead><tr><th>Symbol</th><th>Name</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td>λ</td><td>Lambda</td><td>Average arrival rate (customers/unit time)</td></tr>
+          <tr><td>μ</td><td>Mu</td><td>Average service rate per server (customers/unit time)</td></tr>
+          <tr><td>ρ</td><td>Rho</td><td>Utilisation rate = λ / (c·μ). % of time facility is busy</td></tr>
+          <tr><td>M</td><td>Channels</td><td>Number of parallel servers (gasoline pumps, tellers)</td></tr>
+          <tr><td>L</td><td>System length</td><td>Average number in entire system (waiting + being served)</td></tr>
+          <tr><td>Lq</td><td>Queue length</td><td>Average number in queue only (waiting, not yet served)</td></tr>
+          <tr><td>W</td><td>System time</td><td>Average time in system (waiting + service)</td></tr>
+          <tr><td>Wq</td><td>Queue time</td><td>Average time spent waiting in queue only</td></tr>
+          <tr><td>Pw</td><td>Waiting prob.</td><td>Probability that a customer must wait to be served</td></tr>
+          <tr><td>P₀</td><td>Idle prob.</td><td>Probability that system is idle = 1 – ρ</td></tr>
+          <tr><td>Mμ</td><td>Eff. service rate</td><td>Total system throughput = number of servers × μ</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:#fff;margin-bottom:1rem">Arrival Patterns</h3>
+      <div class="stoch-card" style="margin-bottom:1rem">
+        <h4>Random (Poisson) Arrivals</h4>
+        <p>The most common assumption. Arrivals occur independently and randomly. The number of arrivals in any fixed interval follows a Poisson distribution with parameter λ.</p>
+        <div class="highlight-box">P(k arrivals) = (λᵏ · e⁻λ) / k!</div>
+      </div>
+      <div class="stoch-card" style="margin-bottom:1rem">
+        <h4>Time-Dependent Arrivals</h4>
+        <p>λ varies across the day (e.g. lunch rush, morning commute). Requires time-segmented modelling or simulation rather than a single steady-state formula.</p>
+      </div>
+      <div class="stoch-card">
+        <h4>Assumptions to State Explicitly</h4>
+        <ul class="styled">
+          <li>Steady-state operation (system in equilibrium)</li>
+          <li>Independent, identically distributed (IID) service times</li>
+          <li>No bulk arrivals (one customer at a time)</li>
+          <li>No balking, reneging, or jockeying (unless specified)</li>
+          <li>Infinite calling population (unless finite source model)</li>
+          <li>FCFS queue discipline (unless stated otherwise)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottlenecks -->
+  <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:#fff;margin-top:3rem;margin-bottom:1rem">Identifying Bottlenecks & Limitations</h3>
+  <div class="content-row content-row-3">
+    <div class="theory-panel">
+      <span class="icon">🔴</span>
+      <h3>Bottleneck Detection</h3>
+      <p style="font-size:.9rem;color:var(--muted);line-height:1.7">A bottleneck is any stage where ρ approaches 1. When utilisation nears 100%, queue length grows exponentially and the system becomes unstable. Monitor Lq and Wq to identify the chokepoint.</p>
+    </div>
+    <div class="theory-panel">
+      <span class="icon">📊</span>
+      <h3>Theoretical vs Observed</h3>
+      <p style="font-size:.9rem;color:var(--muted);line-height:1.7"><strong style="color:#fff">Theoretical Distribution:</strong> derived from average arrival rate λ using Poisson formula. <br><br><strong style="color:#fff">Observed Distribution:</strong> constructed from actual system observations. May or may not be Poisson — always verify with goodness-of-fit tests (χ² test).</p>
+    </div>
+    <div class="theory-panel">
+      <span class="icon">⚡</span>
+      <h3>Critical Constraint</h3>
+      <p style="font-size:.9rem;color:var(--muted);line-height:1.7">For the system to be stable and have a finite-length queue:</p>
+      <div class="formula" style="font-size:1.3rem;text-align:center">
+        <span class="var">μ</span> <span class="eq">&gt;</span> <span class="var">λ</span>
+      </div>
+      <p style="font-size:.9rem;color:var(--muted)">If λ ≥ μ, the queue grows to infinity — there is NO steady-state solution.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     C. COMPUTATIONAL MODELLING
+════════════════════════════════════════════════════════════ -->
+<section class="section" id="computational">
+  <div class="section-eyebrow">Module C — Computational Modelling</div>
+  <h2 class="section-title">Kendall-Lee Notation &amp; Formulas</h2>
+  <div class="divider"></div>
+  <p class="section-sub">Formulate models using the A/S/c/K/N/D framework. Justify model selection and compute all key performance measures.</p>
+
+  <!-- Kendall-Lee -->
+  <div style="background:rgba(229,9,20,.06);border:1px solid rgba(229,9,20,.2);border-radius:16px;padding:2rem;margin-bottom:3rem">
+    <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:#fff;margin-bottom:1.5rem;text-align:center">A / S / c / K / N / D</h3>
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:1rem;text-align:center">
+      <div style="background:rgba(0,0,0,.3);border-radius:8px;padding:1rem">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--red)">A</div>
+        <div style="font-size:.75rem;font-weight:600;color:#fff;margin:.35rem 0">Arrival</div>
+        <div style="font-size:.7rem;color:var(--muted)">M = Markovian (Poisson), D = Deterministic, G = General</div>
+      </div>
+      <div style="background:rgba(0,0,0,.3);border-radius:8px;padding:1rem">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--blue)">S</div>
+        <div style="font-size:.75rem;font-weight:600;color:#fff;margin:.35rem 0">Service</div>
+        <div style="font-size:.7rem;color:var(--muted)">M = Exponential, D = Deterministic, G = General</div>
+      </div>
+      <div style="background:rgba(0,0,0,.3);border-radius:8px;padding:1rem">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--teal)">c</div>
+        <div style="font-size:.75rem;font-weight:600;color:#fff;margin:.35rem 0">Servers</div>
+        <div style="font-size:.7rem;color:var(--muted)">Number of parallel servers. c=1 single, c=∞ unlimited</div>
+      </div>
+      <div style="background:rgba(0,0,0,.3);border-radius:8px;padding:1rem">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--gold)">K</div>
+        <div style="font-size:.75rem;font-weight:600;color:#fff;margin:.35rem 0">Capacity</div>
+        <div style="font-size:.7rem;color:var(--muted)">Max customers in system. K=∞ if not stated</div>
+      </div>
+      <div style="background:rgba(0,0,0,.3);border-radius:8px;padding:1rem">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--green)">N</div>
+        <div style="font-size:.75rem;font-weight:600;color:#fff;margin:.35rem 0">Population</div>
+        <div style="font-size:.7rem;color:var(--muted)">Calling population size. N=∞ most common</div>
+      </div>
+      <div style="background:rgba(0,0,0,.3);border-radius:8px;padding:1rem">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--red)">D</div>
+        <div style="font-size:.75rem;font-weight:600;color:#fff;margin:.35rem 0">Discipline</div>
+        <div style="font-size:.7rem;color:var(--muted)">FIFO, LIFO, SIRO, Priority. Default = FIFO</div>
+      </div>
+    </div>
+    <p style="text-align:center;font-size:.85rem;color:var(--muted);margin-top:1.25rem">Full form: <span class="mono gold">M/M/1/∞/∞/FIFO</span> is usually written as just <span class="mono gold">M/M/1</span> when defaults apply</p>
+  </div>
+
+  <!-- Model Formulas -->
+  <div class="theory-grid">
+    <div class="theory-panel">
+      <h3>M/M/1 Model (1 server)</h3>
+      <p style="font-size:.85rem;color:var(--muted);margin-bottom:1rem">Single-channel, Poisson arrivals, exponential service times, infinite queue capacity. The foundational queuing model.</p>
+      <div class="formula">
+        <span class="var">ρ</span> <span class="eq">=</span> <span class="var">λ / μ</span> &nbsp; (utilisation)<br>
+        <span class="var">P₀</span> <span class="eq">=</span> <span class="var">1 − ρ</span> &nbsp; (idle probability)<br>
+        <span class="var">L</span> <span class="eq">=</span> <span class="var">λ / (μ − λ)</span><br>
+        <span class="var">Lq</span> <span class="eq">=</span> <span class="var">λ² / [μ(μ − λ)]</span><br>
+        <span class="var">W</span> <span class="eq">=</span> <span class="var">1 / (μ − λ)</span><br>
+        <span class="var">Wq</span> <span class="eq">=</span> <span class="var">λ / [μ(μ − λ)]</span>
+      </div>
+    </div>
+    <div class="theory-panel">
+      <h3>M/M/c Model (c servers)</h3>
+      <p style="font-size:.85rem;color:var(--muted);margin-bottom:1rem">Multi-channel, Poisson arrivals, exponential service, one shared queue. Effective service rate = c·μ. Requires ρ = λ/(c·μ) &lt; 1.</p>
+      <div class="formula">
+        <span class="var">ρ</span> <span class="eq">=</span> <span class="var">λ / (c·μ)</span> &nbsp; (utilisation)<br>
+        <span class="var">Mμ</span> <span class="eq">=</span> <span class="var">c × μ</span> &nbsp; (effective service rate)<br>
+        <span class="var">P₀</span> = computed via Erlang-C formula<br>
+        <span class="var">Lq</span> <span class="eq">=</span> <span class="var">P₀·(λ/μ)^c·ρ / [c!·(1−ρ)²]</span><br>
+        <span class="var">L</span> <span class="eq">=</span> <span class="var">Lq + λ/μ</span><br>
+        <span class="var">Wq</span> <span class="eq">=</span> <span class="var">Lq / λ</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Little's Law -->
+  <div style="background:rgba(23,195,178,.06);border:1px solid rgba(23,195,178,.2);border-radius:12px;padding:2rem;margin:2rem 0">
+    <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--teal);margin-bottom:1rem">Little's Law — The Universal Connector</h3>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem">
+      <div class="formula" style="border-color:rgba(23,195,178,.3);text-align:center;font-size:1.2rem">
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:.5rem">System</div>
+        <span class="var">L = λ · W</span>
+      </div>
+      <div class="formula" style="border-color:rgba(23,195,178,.3);text-align:center;font-size:1.2rem">
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:.5rem">Queue only</div>
+        <span class="var">Lq = λ · Wq</span>
+      </div>
+      <div class="formula" style="border-color:rgba(23,195,178,.3);text-align:center;font-size:1.2rem">
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:.5rem">Time relationship</div>
+        <span class="var">W = Wq + 1/μ</span>
+      </div>
+    </div>
+    <p style="font-size:.9rem;color:var(--muted);margin-top:1rem">Little's Law holds for ANY queuing system regardless of the distribution — Poisson, deterministic, or general. It is a model-independent identity.</p>
+  </div>
+
+  <!-- INTERACTIVE SIMULATOR -->
+  <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:#fff;margin-bottom:.5rem">🎛️ Live M/M/1 Simulator</h3>
+  <p style="font-size:.9rem;color:var(--muted);margin-bottom:1.5rem">Adjust λ, μ, and number of servers. Watch the system respond in real time.</p>
+
+  <div class="sim-container">
+    <div class="sim-controls">
+      <div class="sim-control">
+        <label>λ — Arrival Rate</label>
+        <input type="range" min="1" max="19" value="6" id="lam" oninput="updateSim()">
+        <div class="val" id="lam-val">6</div>
+        <div style="font-size:.75rem;color:var(--muted)">customers / hour</div>
+      </div>
+      <div class="sim-control">
+        <label>μ — Service Rate</label>
+        <input type="range" min="1" max="20" value="10" id="mu" oninput="updateSim()">
+        <div class="val" id="mu-val">10</div>
+        <div style="font-size:.75rem;color:var(--muted)">customers / hour</div>
+      </div>
+      <div class="sim-control">
+        <label>c — Number of Servers</label>
+        <input type="range" min="1" max="5" value="1" id="c" oninput="updateSim()">
+        <div class="val" id="c-val">1</div>
+        <div style="font-size:.75rem;color:var(--muted)">parallel servers</div>
+      </div>
+    </div>
+
+    <div id="sim-notation" style="font-family:monospace;font-size:1rem;color:var(--gold);margin-bottom:1rem;padding:.75rem 1rem;background:rgba(0,0,0,.3);border-radius:6px"></div>
+
+    <div id="stability-msg" class="sim-status"></div>
+
+    <div class="sim-output" style="margin-top:1.5rem">
+      <div class="sim-metric"><div class="sm-num" id="s-rho">0.6</div><div class="sm-label">ρ Utilisation</div></div>
+      <div class="sim-metric"><div class="sm-num" id="s-L">1.5</div><div class="sm-label">L (avg in system)</div></div>
+      <div class="sim-metric"><div class="sm-num" id="s-Lq">0.9</div><div class="sm-label">Lq (avg in queue)</div></div>
+      <div class="sim-metric"><div class="sm-num" id="s-W">0.25h</div><div class="sm-label">W (time in system)</div></div>
+      <div class="sim-metric"><div class="sm-num" id="s-Wq">0.15h</div><div class="sm-label">Wq (wait in queue)</div></div>
+    </div>
+
+    <!-- Utilisation bar -->
+    <div style="margin-top:1.5rem">
+      <div style="display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted);margin-bottom:.35rem">
+        <span>Server Utilisation</span><span id="rho-pct">60%</span>
+      </div>
+      <div class="progress-bar-wrap"><div class="progress-bar" id="rho-bar" style="width:60%"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     D. STOCHASTIC PROCESSES
+════════════════════════════════════════════════════════════ -->
+<section class="section section-alt" id="stochastic">
+  <div class="section-eyebrow">Module D — Stochastic Processes</div>
+  <h2 class="section-title">System Uncertainty &amp; Randomness</h2>
+  <div class="divider"></div>
+  <p class="section-sub">Understand Poisson processes, Markov chains, IID assumptions, and exponential distributions — and when each is valid in practice.</p>
+
+  <div class="stoch-grid">
+    <div class="stoch-card">
+      <h4>📡 Poisson Process</h4>
+      <p>Models random arrivals. The Poisson distribution gives the probability of k arrivals in a fixed interval given average rate λ. Key properties:</p>
+      <ul class="styled">
+        <li>Arrivals are <strong style="color:#fff">independent</strong> of each other</li>
+        <li>Average rate λ is <strong style="color:#fff">constant</strong> over time</li>
+        <li>At most one arrival per instant</li>
+        <li>Inter-arrival times follow <strong style="color:#fff">Exponential(λ)</strong></li>
+      </ul>
+      <div class="highlight-box">Valid when: customer arrivals are truly random with no clustering. E.g. website hits, student inflow to a library, patient arrivals to a walk-in clinic.</div>
+      <!-- Mini Poisson bar chart -->
+      <div style="margin-top:1rem">
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:.5rem">Poisson distribution (λ=3)</div>
+        <div class="poisson-bars" id="poisson-bars"></div>
+        <div class="pb-labels" id="poisson-labels"></div>
+      </div>
+    </div>
+
+    <div class="stoch-card">
+      <h4>🔄 Markov Process</h4>
+      <p>Models system state transitions. A process is Markovian (memoryless) when the probability of transitioning to the next state depends ONLY on the current state — not on history.</p>
+      <ul class="styled">
+        <li>State space = {0, 1, 2, 3, ...} customers in system</li>
+        <li>Transition rates: λ (arrival) and μ (service departure)</li>
+        <li>Birth-death process: arrivals "birth" the queue, departures "kill" it</li>
+      </ul>
+      <div class="highlight-box">The <strong>memoryless property</strong> of the exponential distribution is what makes M/M/1 tractable — remaining service time doesn't depend on time already spent.</div>
+      <div class="markov-states">
+        <div class="m-state s0">0</div>
+        <div class="m-arrow">⇌</div>
+        <div class="m-state s1">1</div>
+        <div class="m-arrow">⇌</div>
+        <div class="m-state s2">2</div>
+        <div class="m-arrow">⇌</div>
+        <div class="m-state s3">3</div>
+        <div class="m-arrow">…</div>
+      </div>
+      <div style="text-align:center;font-size:.75rem;color:var(--muted)">States = number in system. λ = arrival transitions, μ = service transitions</div>
+    </div>
+
+    <div class="stoch-card">
+      <h4>⚖️ IID Assumption</h4>
+      <p>Independent and Identically Distributed — the assumption that all service times (and inter-arrival times) are drawn from the same distribution independently.</p>
+      <ul class="styled">
+        <li><strong style="color:#fff">Identical:</strong> same distribution, same parameters for every customer</li>
+        <li><strong style="color:#fff">Independent:</strong> one customer's service time has no effect on the next</li>
+      </ul>
+      <p style="margin-top:.75rem">This assumption simplifies analysis enormously. In practice it may be violated when:</p>
+      <ul class="styled">
+        <li>Server fatigue changes μ over time</li>
+        <li>Customer complexity varies systematically (priority classes)</li>
+        <li>Time-of-day effects alter both λ and μ</li>
+      </ul>
+      <div class="highlight-box">Always state and justify the IID assumption. If it fails, Monte Carlo simulation (Module E) is the appropriate tool.</div>
+    </div>
+
+    <div class="stoch-card">
+      <h4>📉 Exponential Distribution</h4>
+      <p>The continuous probability distribution most commonly used for both inter-arrival times and service times in queuing theory. Parameter = rate.</p>
+      <div class="formula">
+        f(t) = μ·e<sup>−μt</sup> &nbsp; (PDF)<br>
+        E[T] = 1/μ &nbsp; (mean service time)<br>
+        P(T &gt; t) = e<sup>−μt</sup> &nbsp; (survival)
+      </div>
+      <ul class="styled">
+        <li><strong style="color:#fff">Memoryless:</strong> P(T>s+t | T>s) = P(T>t)</li>
+        <li>Only continuous memoryless distribution</li>
+        <li>High variance: Coefficient of Variation = 1</li>
+      </ul>
+      <div class="highlight-box">When exponential service is NOT realistic (e.g. fixed-time operations like manufacturing), use M/D/1 (deterministic service) or G/G/1 (general service) models.</div>
+    </div>
+  </div>
+
+  <!-- System Behaviour Analysis -->
+  <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:#fff;margin-top:3rem;margin-bottom:1rem">System Behaviour Analysis</h3>
+  <div class="content-row content-row-3">
+    <div class="theory-panel">
+      <h3>Utilisation (ρ)</h3>
+      <div class="formula">ρ = <span class="var">λ / (c·μ)</span></div>
+      <ul class="styled">
+        <li>ρ &lt; 1: stable system, finite queue</li>
+        <li>ρ → 1: queue grows rapidly to very large values</li>
+        <li>ρ ≥ 1: unstable, queue grows to infinity</li>
+        <li>ρ = 0.5: server busy 50% of the time</li>
+      </ul>
+    </div>
+    <div class="theory-panel">
+      <h3>Queue &amp; Wait Interpretation</h3>
+      <ul class="styled">
+        <li><strong style="color:#fff">Low Lq, low Wq:</strong> efficient system, little waiting</li>
+        <li><strong style="color:#fff">High Lq, high Wq:</strong> bottleneck — add servers or increase μ</li>
+        <li>Lq grows NON-linearly as ρ → 1 (exponential blowup)</li>
+        <li>Doubling μ does NOT halve W — effect is non-linear</li>
+      </ul>
+    </div>
+    <div class="theory-panel">
+      <h3>Operational Performance</h3>
+      <ul class="styled">
+        <li><strong style="color:#fff">Throughput:</strong> rate at which customers complete service = λ (at steady state)</li>
+        <li><strong style="color:#fff">Efficiency:</strong> high ρ = servers kept busy, but customer experience suffers</li>
+        <li><strong style="color:#fff">Trade-off:</strong> adding capacity (↑c or ↑μ) reduces Wq but increases cost</li>
+        <li><strong style="color:#fff">Optimal design:</strong> minimise total cost = waiting cost + service cost</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     E. MONTE CARLO SIMULATION
+════════════════════════════════════════════════════════════ -->
+<section class="section" id="montecarlo">
+  <div class="section-eyebrow">Module E — Monte Carlo &amp; Decision Modelling</div>
+  <h2 class="section-title">Simulation Under Uncertainty</h2>
+  <div class="divider"></div>
+  <p class="section-sub">Define uncertain variables, assign distributions, run repeated sampling, and interpret outcomes for real decisions. Monte Carlo is the tool when analytical formulas don't apply.</p>
+
+  <div class="mc-grid">
+    <div>
+      <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:#fff;margin-bottom:1rem">The Monte Carlo Pipeline</h3>
+      <div class="accordion" id="mc-accordion">
+        <div class="acc-item open">
+          <button class="acc-header" onclick="toggleAcc(this)">
+            <span><span class="red">01</span> &nbsp;Identify Uncertain Variables</span>
+            <span class="chevron">▼</span>
+          </button>
+          <div class="acc-body" style="max-height:300px">
+            <div class="acc-body-inner">
+              List every variable that is uncertain or random: arrival rate λ, service time, demand, prices, costs. Distinguish uncertain variables from known constants. For each uncertain variable, define its possible range and shape of uncertainty.
+            </div>
+          </div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-header" onclick="toggleAcc(this)">
+            <span><span class="red">02</span> &nbsp;Assign Probability Distributions</span>
+            <span class="chevron">▼</span>
+          </button>
+          <div class="acc-body">
+            <div class="acc-body-inner">
+              Choose a distribution that matches what you know. <strong style="color:#fff">Triangular(min, mode, max)</strong> is ideal when you have expert estimates but no historical data. Poisson for random counts. Exponential for service times. Normal for sums of many effects. Uniform when all values are equally likely in a range.
+            </div>
+          </div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-header" onclick="toggleAcc(this)">
+            <span><span class="red">03</span> &nbsp;Run Repeated Sampling</span>
+            <span class="chevron">▼</span>
+          </button>
+          <div class="acc-body">
+            <div class="acc-body-inner">
+              For each trial: sample a value for every uncertain variable from its distribution, compute the outcome (profit, queue length, service time). Repeat N times (typically 1,000–100,000). Each trial is independent.
+            </div>
+          </div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-header" onclick="toggleAcc(this)">
+            <span><span class="red">04</span> &nbsp;Interpret Outcomes</span>
+            <span class="chevron">▼</span>
+          </button>
+          <div class="acc-body">
+            <div class="acc-body-inner">
+              Compute expected value (mean of all trials), variance/std dev (spread of outcomes), percentile ranges (e.g. 90% chance of outcome &lt; X), and probability of loss or failure. Use these to make risk-informed decisions rather than relying on a single-point estimate.
+            </div>
+          </div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-header" onclick="toggleAcc(this)">
+            <span><span class="red">05</span> &nbsp;Law of Large Numbers</span>
+            <span class="chevron">▼</span>
+          </button>
+          <div class="acc-body">
+            <div class="acc-body-inner">
+              As N → ∞, the simulated mean converges to the true expected value. More trials = more reliable estimates. But convergence is slow for rare events in the tails. 10,000 trials is usually sufficient for typical business decisions.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="decision-tree">
+      <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:#fff;margin-bottom:1.25rem">Key Concepts at a Glance</h3>
+
+      <div style="margin-bottom:1.5rem">
+        <h4 style="font-size:.9rem;font-weight:600;color:var(--gold);margin-bottom:.5rem">Distribution Selection Guide</h4>
+        <table class="notation-table">
+          <thead><tr><th>Situation</th><th>Distribution</th></tr></thead>
+          <tbody>
+            <tr><td>Random arrivals (count)</td><td>Poisson</td></tr>
+            <tr><td>Time between random events</td><td>Exponential</td></tr>
+            <tr><td>Expert min/mode/max known</td><td>Triangular</td></tr>
+            <tr><td>Sum of many independent effects</td><td>Normal</td></tr>
+            <tr><td>Equal probability across range</td><td>Uniform</td></tr>
+            <tr><td>Rare events, counting failures</td><td>Binomial / Poisson</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-bottom:1.5rem">
+        <h4 style="font-size:.9rem;font-weight:600;color:var(--gold);margin-bottom:.75rem">Risk vs. Reward Analysis</h4>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+          <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;padding:.75rem;text-align:center">
+            <div style="font-size:.75rem;font-weight:600;color:var(--green);margin-bottom:.25rem">EXPECTED VALUE</div>
+            <div style="font-size:.85rem;color:var(--muted)">Mean of simulated outcomes. Primary decision criterion.</div>
+          </div>
+          <div style="background:rgba(229,9,20,.08);border:1px solid rgba(229,9,20,.2);border-radius:8px;padding:.75rem;text-align:center">
+            <div style="font-size:.75rem;font-weight:600;color:var(--red);margin-bottom:.25rem">VARIABILITY</div>
+            <div style="font-size:.85rem;color:var(--muted)">Std dev, percentile range. Risk tolerance matters.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="highlight-box">
+        <strong>Application contexts:</strong><br>
+        Business decisions (how many servers to add?)<br>
+        Investment scenarios (expected ROI under uncertainty)<br>
+        Startup strategy (break-even probability)<br>
+        Queue design (probability wait &gt; 5 min)
+      </div>
+
+      <h4 style="font-size:.9rem;font-weight:600;color:var(--gold);margin:.75rem 0 .5rem">Triangular Distribution (most common in exams)</h4>
+      <div class="formula">
+        <span class="var">a</span> = minimum value<br>
+        <span class="var">b</span> = most likely (mode)<br>
+        <span class="var">c</span> = maximum value<br>
+        E[X] = (a + b + c) / 3
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     F. DATA MODELLING & FORECASTING
+════════════════════════════════════════════════════════════ -->
+<section class="section section-alt" id="data">
+  <div class="section-eyebrow">Module F — Data Modelling</div>
+  <h2 class="section-title">Forecasting &amp; Integration</h2>
+  <div class="divider"></div>
+  <p class="section-sub">Combine historical data and real-time signals to build forecasting logic. Understand data requirements, model assumptions, and validation techniques.</p>
+
+  <div class="data-grid">
+    <div class="data-card">
+      <h4>📂 Data Requirements</h4>
+      <ul class="styled">
+        <li>Historical arrival timestamps to estimate λ</li>
+        <li>Service completion times to estimate μ</li>
+        <li>Queue length observations at regular intervals</li>
+        <li>System capacity information (K)</li>
+        <li>Enough data to test for Poisson / exponential fit</li>
+      </ul>
+      <p style="margin-top:.75rem">Minimum: 30–50 independent observations per parameter to be estimated.</p>
+    </div>
+    <div class="data-card">
+      <h4>🔑 Key Drivers</h4>
+      <ul class="styled">
+        <li>Time of day / day of week effects on λ</li>
+        <li>Seasonal demand patterns</li>
+        <li>Server skill heterogeneity (affects μ)</li>
+        <li>Equipment reliability (affects μ variability)</li>
+        <li>Customer mix / complexity (affects service time)</li>
+      </ul>
+      <p style="margin-top:.75rem">Use regression or time-series decomposition to extract these drivers from data.</p>
+    </div>
+    <div class="data-card">
+      <h4>✅ Validation Techniques</h4>
+      <ul class="styled">
+        <li><strong style="color:#fff">χ² goodness-of-fit:</strong> test if observed arrivals match Poisson distribution</li>
+        <li><strong style="color:#fff">K-S test:</strong> compare service times to exponential CDF</li>
+        <li><strong style="color:#fff">Residual analysis:</strong> check model predictions vs actual queue lengths</li>
+        <li><strong style="color:#fff">Cross-validation:</strong> train on past data, validate on held-out period</li>
+        <li><strong style="color:#fff">Sensitivity analysis:</strong> vary λ ± 20% — how much does Lq change?</li>
+      </ul>
+    </div>
+    <div class="data-card">
+      <h4>🔮 Forecasting Logic</h4>
+      <ul class="styled">
+        <li>Moving average for short-term λ estimation</li>
+        <li>Exponential smoothing to weight recent data more</li>
+        <li>Time-series models (ARIMA) for seasonal patterns</li>
+        <li>Real-time sensor data to update model parameters continuously</li>
+      </ul>
+      <div class="highlight-box">Forecasted λ feeds into queuing formulas → predicted Lq, Wq → staffing decisions for the next period.</div>
+    </div>
+    <div class="data-card">
+      <h4>⚠️ Model Assumptions &amp; Limitations</h4>
+      <ul class="styled">
+        <li>Steady-state formulas assume time-averaged equilibrium</li>
+        <li>Poisson assumption may fail during rush hours</li>
+        <li>Historical data may not reflect future structural changes</li>
+        <li>Simulation can accommodate non-stationary arrivals; formulas cannot</li>
+        <li>All models are wrong — some are useful</li>
+      </ul>
+    </div>
+    <div class="data-card">
+      <h4>🔗 System Integration</h4>
+      <ul class="styled">
+        <li>Combine queuing model output with financial model (cost/hr of waiting)</li>
+        <li>Feed Wq prediction into customer satisfaction scoring</li>
+        <li>Use Lq forecast to trigger automatic server allocation</li>
+        <li>Validate simulation output against real observed L and W</li>
+      </ul>
+      <div class="highlight-box">End-to-end thinking: data → model → decision → action → feedback → data.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     G. EXAM TIPS
+════════════════════════════════════════════════════════════ -->
+<section class="section" id="exam">
+  <div class="section-eyebrow">Module G — Exam Mastery</div>
+  <h2 class="section-title">Demonstrate Mastery</h2>
+  <div class="divider"></div>
+  <p class="section-sub">Structured guidance to score full marks across all five modelling dimensions. The examiner wants to see end-to-end system thinking, not just formulas.</p>
+
+  <div class="tips-grid">
+    <div class="tip-card">
+      <div class="tip-num">01</div>
+      <div class="tip-content">
+        <h4>Always start with the conceptual model</h4>
+        <p>Before writing any formula, identify: what are the entities (customers)? What is the server? What is the queue discipline? Draw the flow diagram: Arrival → Queue → Service → Exit. Label each arrow with the relevant variable (λ, μ). Examiners award marks for structured setup.</p>
+      </div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-num">02</div>
+      <div class="tip-content">
+        <h4>Write out Kendall-Lee notation explicitly</h4>
+        <p>State the full A/S/c/K/N/D notation for every model you analyse. If K=∞ and N=∞, still write it out. Then justify each choice: "Arrivals are Poisson (M) because they are random and independent. Service is exponential (M) because of the memoryless property..."</p>
+      </div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-num">03</div>
+      <div class="tip-content">
+        <h4>Check stability FIRST before computing anything</h4>
+        <p>Always compute ρ = λ/(c·μ) before applying any formula. If ρ ≥ 1, state: "The system is UNSTABLE. The queue grows without bound. The M/M/c formulas do not apply. We need to increase c or μ, or reduce λ."</p>
+      </div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-num">04</div>
+      <div class="tip-content">
+        <h4>State ALL assumptions explicitly</h4>
+        <p>IID service times, Poisson arrivals, FCFS discipline, infinite population, steady-state operation. If any assumption is questionable for the given scenario, say so. Noting limitations shows higher-order thinking and earns interpretation marks.</p>
+      </div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-num">05</div>
+      <div class="tip-content">
+        <h4>Interpret numbers in operational terms</h4>
+        <p>Don't just write "Lq = 3.6". Write: "On average, 3.6 customers are waiting in the queue. At £15/hour opportunity cost, this represents £54/hour of lost value. Adding a second server reduces Lq to 0.5, saving £46/hour — easily justifying the server cost."</p>
+      </div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-num">06</div>
+      <div class="tip-content">
+        <h4>Link stochastic concepts to the model</h4>
+        <p>For every model, explain WHY Poisson and exponential are appropriate: "The memoryless property of the exponential distribution ensures Markovian transitions, making the M/M/1 model analytically tractable." This demonstrates understanding beyond formula substitution.</p>
+      </div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-num">07</div>
+      <div class="tip-content">
+        <h4>Use Little's Law as a cross-check</h4>
+        <p>After computing L, Lq, W, Wq — verify: Does L = λ·W? Does Lq = λ·Wq? Does W = Wq + 1/μ? If not, you have made an arithmetic error. Little's Law is a model-free identity that always holds.</p>
+      </div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-num">08</div>
+      <div class="tip-content">
+        <h4>Monte Carlo: focus on decision, not just simulation</h4>
+        <p>In Monte Carlo questions, always end with: "Based on N trials, the expected outcome is X with a standard deviation of Y. There is a Z% probability of loss/failure. Therefore the recommended decision is..." — the simulation is a means to a decision, not the end goal.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Reference Formula Card -->
+  <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:#fff;margin:3rem 0 1rem">📋 Quick Reference — M/M/1 Formula Sheet</h3>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2rem">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2rem">
+      <div>
+        <div style="font-size:.75rem;font-weight:600;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:.75rem">Utilisation</div>
+        <div class="formula">ρ = λ / μ</div>
+        <div class="formula">P₀ = 1 − ρ</div>
+      </div>
+      <div>
+        <div style="font-size:.75rem;font-weight:600;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:.75rem">Lengths</div>
+        <div class="formula">L = ρ / (1−ρ) = λ/(μ−λ)</div>
+        <div class="formula">Lq = ρ² / (1−ρ)</div>
+      </div>
+      <div>
+        <div style="font-size:.75rem;font-weight:600;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:.75rem">Times</div>
+        <div class="formula">W = 1 / (μ−λ)</div>
+        <div class="formula">Wq = λ / [μ(μ−λ)]</div>
+        <div class="formula">W = Wq + 1/μ</div>
+      </div>
+    </div>
+    <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)">
+      <div style="font-size:.75rem;font-weight:600;color:var(--teal);letter-spacing:2px;text-transform:uppercase;margin-bottom:.75rem">Little's Law (universal)</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem">
+        <div class="formula" style="border-color:rgba(23,195,178,.3)">L = λ · W</div>
+        <div class="formula" style="border-color:rgba(23,195,178,.3)">Lq = λ · Wq</div>
+        <div class="formula" style="border-color:rgba(23,195,178,.3)">W = Wq + 1/μ</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo-f">Q&amp;CHILL</div>
+  <p>COSC 408 — Modelling Topic 6: Queuing Theory &nbsp;|&nbsp; All formulas verified &nbsp;|&nbsp; Study hard, queue smart</p>
+  <p style="margin-top:.5rem;font-size:.75rem;opacity:.5">Stability condition: always μ &gt; λ</p>
+</footer>
+
+<script>
+// ── SIMULATOR ──────────────────────────────────────────────
+function updateSim(){
+  const lam = +document.getElementById('lam').value;
+  const mu  = +document.getElementById('mu').value;
+  const c   = +document.getElementById('c').value;
+  document.getElementById('lam-val').textContent = lam;
+  document.getElementById('mu-val').textContent = mu;
+  document.getElementById('c-val').textContent = c;
+  const rho = lam / (c * mu);
+  const stable = rho < 1;
+  const notation = `M/M/${c} — λ=${lam}, μ=${mu}, ρ=${rho.toFixed(3)}, Mμ=${c*mu}`;
+  document.getElementById('sim-notation').textContent = notation;
+  const msg = document.getElementById('stability-msg');
+  if(stable){
+    msg.className = 'sim-status status-stable';
+    msg.textContent = '✔ System Stable — λ < c·μ';
+    const L  = rho / (1 - rho);
+    const Lq = rho * rho / (1 - rho);
+    const W  = 1 / (mu - lam);
+    const Wq = lam / (mu * (mu - lam));
+    document.getElementById('s-rho').textContent = rho.toFixed(3);
+    document.getElementById('s-L').textContent   = L.toFixed(2);
+    document.getElementById('s-Lq').textContent  = Lq.toFixed(2);
+    document.getElementById('s-W').textContent   = W.toFixed(3)+'h';
+    document.getElementById('s-Wq').textContent  = Wq.toFixed(3)+'h';
+    const pct = Math.min(rho * 100, 100);
+    document.getElementById('rho-pct').textContent = pct.toFixed(1)+'%';
+    document.getElementById('rho-bar').style.width = pct+'%';
+    document.getElementById('rho-bar').style.background = pct > 85 ? 'var(--gold)' : pct > 95 ? 'var(--red)' : 'var(--red)';
+  } else {
+    msg.className = 'sim-status status-unstable';
+    msg.textContent = '✘ System Unstable — λ ≥ c·μ. Queue grows to infinity!';
+    ['s-rho','s-L','s-Lq','s-W','s-Wq'].forEach(id => document.getElementById(id).textContent = '∞');
+    document.getElementById('rho-pct').textContent = '≥100%';
+    document.getElementById('rho-bar').style.width = '100%';
+    document.getElementById('rho-bar').style.background = '#e50914';
+  }
+}
+updateSim();
+
+// ── ACCORDION ─────────────────────────────────────────────
+function toggleAcc(btn){
+  const item = btn.parentElement;
+  const body = item.querySelector('.acc-body');
+  const inner = item.querySelector('.acc-body-inner');
+  if(item.classList.contains('open')){
+    item.classList.remove('open');
+    body.style.maxHeight = '0';
+  } else {
+    document.querySelectorAll('.acc-item.open').forEach(i=>{
+      i.classList.remove('open');
+      i.querySelector('.acc-body').style.maxHeight = '0';
+    });
+    item.classList.add('open');
+    body.style.maxHeight = inner.scrollHeight + 40 + 'px';
+  }
+}
+// Init first open
+document.querySelectorAll('.acc-item.open').forEach(i=>{
+  const inner = i.querySelector('.acc-body-inner');
+  i.querySelector('.acc-body').style.maxHeight = inner.scrollHeight + 40 + 'px';
+});
+
+// ── POISSON BARS ──────────────────────────────────────────
+function poisson(lambda, k){ return Math.pow(lambda,k) * Math.exp(-lambda) / factorial(k); }
+function factorial(n){ return n <= 1 ? 1 : n * factorial(n-1); }
+const lam3 = 3;
+const pbContainer = document.getElementById('poisson-bars');
+const plContainer = document.getElementById('poisson-labels');
+const maxProb = poisson(lam3, Math.floor(lam3));
+for(let k=0; k<=9; k++){
+  const p = poisson(lam3, k);
+  const bar = document.createElement('div');
+  bar.className = 'pb';
+  bar.style.height = (p/maxProb*100)+'%';
+  bar.style.opacity = 0.5 + p/maxProb*0.5;
+  bar.title = `k=${k}: P=${p.toFixed(4)}`;
+  pbContainer.appendChild(bar);
+  const lbl = document.createElement('div');
+  lbl.className = 'pb-l';
+  lbl.textContent = k;
+  plContainer.appendChild(lbl);
+}
+
+// ── NAV SCROLL ────────────────────────────────────────────
+function scrollTo(id){
+  const el = document.getElementById(id);
+  if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+</script>
+</body>
+</html>
